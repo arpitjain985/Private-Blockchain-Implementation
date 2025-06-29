@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fabric DApp</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { padding: 10px 15px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:hover { background: #45a049; }
+        .result { margin-top: 20px; padding: 10px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h1>Asset Management DApp</h1>
+    
+    <div class="form-group">
+        <h2>Create Asset</h2>
+        <label for="id">ID:</label>
+        <input type="text" id="id">
+        
+        <label for="color">Color:</label>
+        <input type="text" id="color">
+        
+        <label for="size">Size:</label>
+        <input type="number" id="size">
+        
+        <label for="owner">Owner:</label>
+        <input type="text" id="owner">
+        
+        <label for="value">Appraised Value:</label>
+        <input type="number" id="value">
+        
+        <button onclick="createAsset()">Create Asset</button>
+    </div>
+    
+    <div class="form-group">
+        <h2>Read Asset</h2>
+        <label for="assetId">Asset ID:</label>
+        <input type="text" id="assetId">
+        <button onclick="readAsset()">Read Asset</button>
+        <div id="assetResult" class="result"></div>
+    </div>
+    
+    <script>
+        async function createAsset() {
+            const asset = {
+                id: document.getElementById('id').value,
+                color: document.getElementById('color').value,
+                size: document.getElementById('size').value,
+                owner: document.getElementById('owner').value,
+                appraisedValue: document.getElementById('value').value
+            };
+            
+            try {
+                const response = await fetch('http://localhost:4000/api/createAsset', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(asset)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    alert('Asset created successfully!');
+                } else {
+                    alert('Error creating asset');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error creating asset');
+            }
+        }
+        
+        async function readAsset() {
+            const assetId = document.getElementById('assetId').value;
+            
+            try {
+                const response = await fetch(`http://localhost:4000/api/readAsset/${assetId}`);
+                const asset = await response.json();
+                
+                document.getElementById('assetResult').innerHTML = `
+                    <p><strong>ID:</strong> ${asset.ID}</p>
+                    <p><strong>Color:</strong> ${asset.color}</p>
+                    <p><strong>Size:</strong> ${asset.size}</p>
+                    <p><strong>Owner:</strong> ${asset.owner}</p>
+                    <p><strong>Appraised Value:</strong> ${asset.appraisedValue}</p>
+                `;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('assetResult').innerHTML = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
